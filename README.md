@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Flask Web App
 
 Quick dev run instructions
@@ -30,3 +31,6 @@ python -m pip install flask
 ```
 
 - If the navbar toggler doesn't expand, try disabling `static/script.js` temporarily (it may throw a JS error). Open DevTools → Console to see errors.
+=======
+# Flask-Web-App
+>>>>>>> d34f0937ddec52ae1719ef1aa49f6da3f731bb73
