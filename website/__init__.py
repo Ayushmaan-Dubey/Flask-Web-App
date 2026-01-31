@@ -25,11 +25,17 @@ def create_app():
 
     # initialize db only if Flask-SQLAlchemy is installed
     if db is not None:
-        # configure a default sqlite database if one isn't set
-        # use an absolute path to avoid issues with working directory and spaces
-        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.db')
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
-        app.config.setdefault('SQLALCHEMY_DATABASE_URI', f"sqlite:///{db_path}")
+        # use DATABASE_URL in production (e.g. Heroku, Railway, Render); fall back to SQLite locally
+        database_url = os.environ.get('DATABASE_URL')
+        if database_url:
+            # Heroku may use postgres:// - SQLAlchemy expects postgresql://
+            if database_url.startswith('postgres://'):
+                database_url = 'postgresql://' + database_url[len('postgres://'):]
+            app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+        else:
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'database.db')
+            os.makedirs(os.path.dirname(db_path), exist_ok=True)
+            app.config.setdefault('SQLALCHEMY_DATABASE_URI', f"sqlite:///{db_path}")
         app.config.setdefault('SQLALCHEMY_TRACK_MODIFICATIONS', False)
         db.init_app(app)
 
