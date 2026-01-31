@@ -19,13 +19,15 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ml-auto">
-          {% if current_user.is_authenticated %}
           <li class="nav-item"><a class="nav-link" href="{{ url_for('views.home') }}">Home</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.admin_login') }}">Admin Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.admin_sign_up') }}">Admin Signup</a></li>
+          {% if current_user.is_authenticated and (current_user.is_admin|default(false)) %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('admin.admin_users') }}">Admin Users</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.admin_logout') }}">Logout</a></li>
           {% else %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.sign_up') }}">Sign Up</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
-        {% endif %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
+          {% endif %}
         </ul>
       </div>
     </nav>

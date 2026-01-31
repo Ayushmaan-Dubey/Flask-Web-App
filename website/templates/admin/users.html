@@ -1,0 +1,42 @@
+{% extends 'base.HTML' %}
+{% block title %}Admin - Users{% endblock %}
+{% block content %}
+<h1>Registered users</h1>
+<p><a href="{{ url_for('admin.admin_index') }}">Admin Home</a> | <a href="{{ url_for('admin.admin_create_user') }}">Create User</a></p>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Email</th>
+      <th>First name</th>
+      <th>Last name</th>
+      <th>First time</th>
+      <th>Date</th>
+      <th>Area</th>
+      <th>Interests</th>
+      <th>Event</th>
+      <th>Created by</th>
+      <th>Admin</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u.id }}</td>
+        <td>{{ u.email }}</td>
+        <td>{{ u.first_name }}</td>
+        <td>{{ u.last_name or '' }}</td>
+        <td>{{ 'Yes' if (u.first_time_at_temple|default(false)) else 'No' }}</td>
+        <td>{{ u.contact_date or '' }}</td>
+        <td>{{ u.area or '' }}</td>
+        <td>{{ u.interests or '' }}</td>
+        <td>{{ u.event_source or '' }}</td>
+        <td>{{ u.created_by_admin or '' }}</td>
+        <td>{{ 'Yes' if (u.is_admin|default(false)) else 'No' }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="11">No users</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

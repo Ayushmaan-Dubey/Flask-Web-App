@@ -2,6 +2,7 @@ from os import path
 from flask import Flask
 import os
 from flask_login import LoginManager
+from sqlalchemy import inspect, text
 
 # Try to import Flask-SQLAlchemy; make it optional so app still runs if package is missing.
 try:
@@ -19,6 +20,8 @@ def create_app():
     app = Flask(__name__)
     # ensure SECRET_KEY is set so flash() (which uses the session) works
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret')
+    # enable admin signup via environment variable (true/1/yes)
+    app.config['ADMIN_SIGNUP_ENABLED'] = os.environ.get('ADMIN_SIGNUP_ENABLED', 'false').lower() in ('1','true','yes')
 
     # initialize db only if Flask-SQLAlchemy is installed
     if db is not None:
@@ -30,16 +33,49 @@ def create_app():
         app.config.setdefault('SQLALCHEMY_TRACK_MODIFICATIONS', False)
         db.init_app(app)
 
-        # import models so SQLAlchemy registers the metadata, then create tables
+        # import models so SQLAlchemy registers the metadata
         with app.app_context():
             from . import models  # registers model classes
+            # if the user table already exists but lacks is_admin, add the column
+            inspector = inspect(db.engine)
+            if 'user' in inspector.get_table_names():
+                cols = [c['name'] for c in inspector.get_columns('user')]
+                # add is_admin if missing
+                if 'is_admin' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN is_admin BOOLEAN DEFAULT 0"))
+                    db.session.commit()
+                # add new fields if missing
+                if 'last_name' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN last_name VARCHAR"))
+                    db.session.commit()
+                if 'first_time_at_temple' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN first_time_at_temple BOOLEAN DEFAULT 0"))
+                    db.session.commit()
+                if 'contact_date' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN contact_date DATE"))
+                    db.session.commit()
+                if 'area' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN area VARCHAR"))
+                    db.session.commit()
+                if 'interests' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN interests VARCHAR"))
+                    db.session.commit()
+                if 'event_source' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN event_source VARCHAR"))
+                    db.session.commit()
+                if 'created_by_admin' not in cols:
+                    db.session.execute(text("ALTER TABLE user ADD COLUMN created_by_admin VARCHAR"))
+                    db.session.commit()
+            # create any missing tables
             db.create_all()
 
     from .views import views
     from .auth import auth
+    from .admin import admin
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
+    app.register_blueprint(admin, url_prefix='/')
 
     # initialize login manager with the app (do not call init_app at module import time)
     login_manager.init_app(app)

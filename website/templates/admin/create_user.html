@@ -1,0 +1,108 @@
+{% extends 'base.HTML' %}
+{% block title %}Create User{% endblock %}
+{% block content %}
+<h1>Create User</h1>
+{% if errors %}
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      {% for e in errors %}
+        <li>{{ e }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+<form method="post">
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label>Email</label>
+      <input type="email" name="email" class="form-control" value="{{ form.email if form else '' }}" required>
+    </div>
+    <div class="form-group col-md-6">
+      <label>First name</label>
+      <input type="text" name="firstName" class="form-control" value="{{ form.firstName if form else '' }}" required>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-6">
+      <label>Last name</label>
+      <input type="text" name="lastName" class="form-control" value="{{ form.lastName if form else '' }}">
+    </div>
+    <div class="form-group col-md-6">
+      <label>First time at temple?</label>
+      <select name="first_time_at_temple" class="form-control">
+        <option value="no" {% if form and form.get('first_time_at_temple') == 'no' %}selected{% endif %}>No</option>
+        <option value="yes" {% if form and form.get('first_time_at_temple') == 'yes' %}selected{% endif %}>Yes</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="form-group col-md-4">
+      <label>Date</label>
+      <input type="date" name="contact_date" class="form-control" value="{{ form.contact_date if form else '' }}">
+    </div>
+    <div class="form-group col-md-4">
+      <label>Area</label>
+      <select name="area" class="form-control">
+        {% set selected_area = (form.area if form else '') %}
+        <option value="">-- Select --</option>
+        <option value="Round Rock" {% if selected_area == 'Round Rock' %}selected{% endif %}>Round Rock</option>
+        <option value="Leander" {% if selected_area == 'Leander' %}selected{% endif %}>Leander</option>
+        <option value="Georgetown" {% if selected_area == 'Georgetown' %}selected{% endif %}>Georgetown</option>
+        <option value="Cedar Park" {% if selected_area == 'Cedar Park' %}selected{% endif %}>Cedar Park</option>
+        <option value="Pflugerville" {% if selected_area == 'Pflugerville' %}selected{% endif %}>Pflugerville</option>
+        <option value="West Lake Hills" {% if selected_area == 'West Lake Hills' %}selected{% endif %}>West Lake Hills</option>
+        <option value="Other" {% if selected_area == 'Other' %}selected{% endif %}>Other</option>
+      </select>
+    </div>
+    <div class="form-group col-md-4">
+      <label>Interests</label>
+      {% set chosen = form.getlist('interests') if form else [] %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="interests" value="Festivals" id="int_festivals" {% if 'Festivals' in chosen %}checked{% endif %}>
+        <label class="form-check-label" for="int_festivals">Festivals</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="interests" value="Sunday Keerthan/Discourse" id="int_keerthan" {% if 'Sunday Keerthan/Discourse' in chosen %}checked{% endif %}>
+        <label class="form-check-label" for="int_keerthan">Sunday Keerthan/Discourse</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="interests" value="Sunday School (kids)" id="int_ss_kids" {% if 'Sunday School (kids)' in chosen %}checked{% endif %}>
+        <label class="form-check-label" for="int_ss_kids">Sunday School Classes (kids)</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="interests" value="Sunday School (adults)" id="int_ss_adults" {% if 'Sunday School (adults)' in chosen %}checked{% endif %}>
+        <label class="form-check-label" for="int_ss_adults">Sunday School Classes (adults)</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="interests" value="Bharatnatyam (All ages)" id="int_bharat" {% if 'Bharatnatyam (All ages)' in chosen %}checked{% endif %}>
+        <label class="form-check-label" for="int_bharat">Bharatnatyam (All ages)</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="interests" value="Volunteering" id="int_volunteering" {% if 'Volunteering' in chosen %}checked{% endif %}>
+        <label class="form-check-label" for="int_volunteering">Volunteering</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="interests" value="Other Special Occasions" id="int_other" {% if 'Other Special Occasions' in chosen %}checked{% endif %}>
+        <label class="form-check-label" for="int_other">Other Special Occasions</label>
+      </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label>What event was this contact made in?</label>
+    <select name="event_source" class="form-control">
+      {% set es = (form.event_source if form else '') %}
+      <option value="">-- Select --</option>
+      <option value="Sunday School" {% if es == 'Sunday School' %}selected{% endif %}>Sunday School</option>
+      <option value="Book Distribution" {% if es == 'Book Distribution' %}selected{% endif %}>Book Distribution</option>
+      <option value="Sunday Keerthan/Aarti" {% if es == 'Sunday Keerthan/Aarti' %}selected{% endif %}>Sunday Keerthan/Aarti</option>
+      <option value="Festival" {% if es == 'Festival' %}selected{% endif %}>Festival</option>
+      <option value="Other" {% if es == 'Other' %}selected{% endif %}>Other</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>Which admin is filling this out?</label>
+    <input type="text" class="form-control" value="{{ current_user.first_name if current_user.is_authenticated else '' }}" readonly>
+  </div>
+  <button class="btn btn-primary">Create User</button>
+</form>
+{% endblock %}
