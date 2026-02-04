@@ -78,15 +78,8 @@ def admin_create_user():
                 flash('User already exists. Please check existing users in the database.', 'warning')
                 return redirect(url_for('admin.admin_users'))
 
-        password1 = request.form.get('password1', '')
-        password2 = request.form.get('password2', '')
-
-        if not email or not firstName or not password1 or not password2:
+        if not email or not firstName:
             errors.append('Please fill out all required fields.')
-        if password1 != password2:
-            errors.append('Passwords do not match.')
-        if len(password1) < 6:
-            errors.append('Password must be at least 6 characters.')
 
         if db is not None:
             existing_user = User.query.filter_by(email=email).first()
